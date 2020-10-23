@@ -28,7 +28,7 @@
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "fs": "0.0.2",
-    "lavaclient": "^3.1.2",
+    "lavaclient": "^3.0.9",
     "moment": "^2.29.1",
     "mongoose": "^5.10.9",
     "node-fetch": "^2.6.1"
