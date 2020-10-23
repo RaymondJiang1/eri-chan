@@ -1,0 +1,31 @@
+{
+  "name": "eri-chan",
+  "version": "1.0.0",
+  "description": "Eri Chan discord bot",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaymondJiang1/eri-chan.git"
+  },
+  "author": "RaymondJiang1#6464",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RaymondJiang1/eri-chan/issues"
+  },
+  "homepage": "https://github.com/RaymondJiang1/eri-chan#readme",
+  "dependencies": {
+    "@sentry/node": "^5.27.0",
+    "ascii-table": "0.0.9",
+    "chalk": "^4.1.0",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "fs": "0.0.2",
+    "moment": "^2.29.1",
+    "mongoose": "^5.10.9"
+  }
+}
