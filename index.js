@@ -11,6 +11,7 @@ const { Client, Collection } = require('discord.js'),
 	config = require('./config.json'),
 	Logger = require('./util/Logger'),
 	mongoose = require('mongoose'),
+	{ Manager } = require('lavaclient'),
 	client = new Client({
 		disableMentions: 'everyone',
 	});
@@ -20,6 +21,15 @@ client.commands = new Collection();
 client.aliases = new Collection();
 const cooldowns = new Collection();
 
+// For music
+client.music = new Manager(config.nodes, {
+	shards: client.shard ? client.shard.count : 1,
+	send(id, packet) {
+		const guild = client.guilds.cache.get(id);
+		if (guild) return guild.shard.send(packet);
+	},
+});
+
 // Command Loader
 ['command'].forEach((handler) => {
 	require(`./handlers/${handler}`)(client);
@@ -28,7 +38,9 @@ const cooldowns = new Collection();
 // Events
 client
 	// Ready Event
-	.on('ready', () => {
+	.on('ready', async () => {
+		// Initalizes the music
+		await client.music.init(client.user.id);
 		// Connect to Sentry
 		if (config.apikeys.sentrydsn) {
 			// Try and catch to connect to Sentry
@@ -76,39 +88,46 @@ client
 		let command = client.commands.get(cmd);
 		if (!command) command = client.commands.get(client.aliases.get(cmd));
 
-		if (!cooldowns.has(command.name)) {
-			cooldowns.set(command.name, new Collection());
-		}
+		if (command) {
+			if (!cooldowns.has(command.name)) {
+				cooldowns.set(command.name, new Collection());
+			}
 
-		const now = Date.now();
-		const timestamps = cooldowns.get(command.name);
-		const cooldownAmount = (command.cooldown || 1) * 1000;
+			const now = Date.now();
+			const timestamps = cooldowns.get(command.name);
+			const cooldownAmount = (command.cooldown || 1) * 1000;
 
-		if (timestamps.has(message.author.id)) {
-			const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+			if (timestamps.has(message.author.id)) {
+				const expirationTime =
+					timestamps.get(message.author.id) + cooldownAmount;
 
-			if (now < expirationTime) {
-				const timeLeft = (expirationTime - now) / 1000;
-				return message.reply(
-					`please wait ${timeLeft.toFixed(
-						1,
-					)} more second(s) before reusing the \`${command.name}\` command.`,
+				if (now < expirationTime) {
+					const timeLeft = (expirationTime - now) / 1000;
+					return message.reply(
+						`please wait ${timeLeft.toFixed(
+							1,
+						)} more second(s) before reusing the \`${command.name}\` command.`,
+					);
+				}
+			}
+
+			timestamps.set(message.author.id, now);
+			setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+
+			try {
+				command.run(client, message, args);
+			} catch (error) {
+				Logger.error(error);
+				message.reply(
+					`There was an error executing the command \`${command.name}\`.`,
 				);
 			}
 		}
-
-		timestamps.set(message.author.id, now);
-		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-
-		try {
-			command.run(client, message, args);
-		} catch (error) {
-			Logger.error(error);
-			message.reply(
-				`There was an error executing the command \`${command.name}\`.`,
-			);
-		}
 	});
+
+// Music Events
+client.ws.on('VOICE_SERVER_UPDATE', (pk) => client.music.serverUpdate(pk));
+client.ws.on('VOICE_STATE_UPDATE', (pk) => client.music.stateUpdate(pk));
 
 // Logins in the discord bot
 client.login(config.discordBotConfig.token);

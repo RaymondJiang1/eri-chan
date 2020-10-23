@@ -2,13 +2,17 @@
   "name": "eri-chan",
   "version": "1.0.0",
   "description": "Eri Chan discord bot",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RaymondJiang1/eri-chan.git"
+  },
+  "engines": {
+    "node": ">=12.x"
   },
   "author": "RaymondJiang1#6464",
   "license": "MIT",
@@ -24,7 +28,9 @@
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "fs": "0.0.2",
+    "lavaclient": "^3.1.2",
     "moment": "^2.29.1",
-    "mongoose": "^5.10.9"
+    "mongoose": "^5.10.9",
+    "node-fetch": "^2.6.1"
   }
 }
