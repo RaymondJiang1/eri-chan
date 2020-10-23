@@ -1,7 +1,7 @@
 /*
  * Eri Chan bot for discord
  * Copyright (C) 2020 Raymond Jiang
- * This software is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+ * This software is licensed under MIT
  * For more information, see README.md and LICENSE
  */
 const { MessageEmbed } = require('discord.js');

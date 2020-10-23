@@ -1,7 +1,7 @@
 /*
  * Eri Chan bot for discord
  * Copyright (C) 2020 Raymond Jiang
- * This software is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+ * This software is licensed under MIT
  * For more information, see README.md and LICENSE
  */
 
@@ -39,13 +39,26 @@ client
 				Logger.error(e);
 			}
 		}
+		mongoose
+			.connect(config.discordBotConfig.mongodburl, {
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+			})
+			.then(() => Logger.info('Connected to the mongodb database!'));
 		// Logs, Eri Chan has logged in when it has logged in
 		Logger.info('Eri Chan has logged in!');
 	})
 	// Message Event
 	.on('message', async (message) => {
+		const mention = RegExp(`^<@!${client.user.id}>$`);
 		// Set the prefix variable
 		const prefix = config.discordBotConfig.prefix;
+
+		if (message.content.match(mention)) {
+			return message.channel.send(
+				`My prefix for ${message.guild.name} is \`${config.discordBotConfig.prefix}\``,
+			);
+		}
 		// If the author is a bot, if the message is not sent in a server, or if the message does not start with the prefix, then it will return nothing
 		if (
 			message.author.bot ||
@@ -91,9 +104,9 @@ client
 			command.run(client, message, args);
 		} catch (error) {
 			Logger.error(error);
-			message
-				.reply(`There was an error executing the command \`${command.name}\`.`)
-				.catch(console.error);
+			message.reply(
+				`There was an error executing the command \`${command.name}\`.`,
+			);
 		}
 	});
 
